@@ -1,18 +1,19 @@
+function []= pongengine(app)
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+fig=figure
+plot(3,3)
 
-for i= 0:1:100
-fig= app.UIAxes
-ballPlot= plot(fig,0+i,0+i);
+title (app.NickPlayer2EditField.Value)
+set(fig,'KeyPressFcn',@keyDown)
 
-set(ballPlot, 'Marker', '.');
-%set(ballPlot, 'MarkerEdgeColor', 'red');
-set(ballPlot, 'Color', 'g');
-set(ballPlot, 'MarkerSize', 50);
+    function keyDown(src,event)
+        switch event.Key
+            case 'q'
+                app.Pong.Visible='on'
+                close(gcf)
+        end
+    end
 
-axis([0 100 0 100]);
-axis manual
-% BALL_MARKER_SIZE = 10; %aesthetic, does not affect physics, see BALL_RADIUS
-% BALL_COLOR = [.1, .7, .1];
-% BALL_OUTLINE = [.7, 1, .7];
-% BALL_SHAPE = '.';
-pause(1)
 end
+

@@ -19,6 +19,7 @@ set(fig, 'DeleteFcn', @figureclose)
 
     function figureclose(src,event)
         app.Pong.Visible='on'
+        
     end
 
 end

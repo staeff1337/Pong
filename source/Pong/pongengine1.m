@@ -19,6 +19,10 @@ end
 PADDLE_SPEED_COMP=PADDLE_SPEED_COMP_MAX;
 
 rounds= app.RoundsEditField.Value;
+roundsPlayed=1;
+
+namePlayer1= app.NickPlayer1EditField.Value;
+namePlayer2= app.NickPlayer2EditField.Value;
 
 fig= figure;
 %Quelle: https://ch.mathworks.com/help/matlab/ref/matlab.ui.figure-properties.html
@@ -95,17 +99,22 @@ patch([0 1 1 0], [0 0 0.05 0.05], [0 0 0 0], 'facecolor', 'g', ...
     'edgecolor', 'g', 'handlevisibility', 'off');
 
 %% Draw Scores & rounds
-sc_left = text(0.425 , 0.96, '0');
-sc_right = text(0.575 , 0.96, '0');
-//t_rounds = text(
+sc_left = text(0.06 , 0.975, '0', 'horizontalAlignment', 'center');
+sc_right = text(0.94 , 0.975, '0','horizontalAlignment', 'center');
 
+%quelle https://ch.mathworks.com/matlabcentral/answers/251996-how-to-insert-space-between-strings-while-doing-strcat
+textRounds = strcat( 'Round', 32, num2str(roundsPlayed), ' /', 32, num2str(rounds));
+t_rounds = text(0.5, 0.975, textRounds, 'horizontalAlignment', 'center');
+
+t_player1= text(0.975, 0.025, namePlayer1, 'horizontalAlignment', 'right');
+t_player2= text(0.025, 0.025, namePlayer2, 'horizontalAlignment', 'left');
 
 %% Draw Pause
-t_pause = text(0.5, 0.5, 'Game paused', 'visible','off');
+t_pause = text(0.5, 0.5, 'game paused','visible','off','horizontalAlignment', 'center');
 
 %% Set Text Options
-set([sc_left sc_right t_pause t_rounds], 'fontsize', 25, ...
-    'color', 'r', 'hor', 'center');
+set([sc_left sc_right t_rounds t_player1 t_player2], 'fontname', 'consolas', 'fontsize', 30, 'color', 'k');
+set(t_pause, 'fontname', 'consolas', 'fontsize', 30, 'color', 'w');
 
 
 %% Set Listners
@@ -206,8 +215,6 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
             else
                 ballVector= [rand, rand];
             end
-            ballSpeed= 0.01;
-            newX= 0.5; newY= 0.5;
             if newX < BALL_RADIUS
                 score = get(sc_right, 'string');
                 set(sc_right, 'string', str2double(score)+1);
@@ -215,7 +222,12 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
                 score = get(sc_left, 'string');
                 set(sc_left, 'string', str2double(score)+1);
             end
-            
+            roundsPlayed= roundsPlayed+1;
+            textRounds = strcat( 'Round', 32, num2str(roundsPlayed), ' /', 32, num2str(rounds));
+            set(t_rounds,'string',textRounds);            
+            ballSpeed= 0.01;
+            newX= 0.5; newY= 0.5;
+
             %hit left player
         elseif (ball.XData - BALL_RADIUS) < playerLeft.XData(2) && playerLeft.YData(2) <= yLeft && yLeft <= playerLeft.YData(3)
             %         disp('Hit Left')

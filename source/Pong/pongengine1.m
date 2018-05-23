@@ -5,19 +5,20 @@ function []= pongengine1(app)
 %1= v CPU
 PADDLE_SPEED= 0.02;
 quit= false;
+paused= false;
 
 %set Computer skill level
 switch app.SkillButtonGroup.SelectedObject.Text
     case 'low'
-        display('level is low')
-        PADDLE_SPEED_COMP= 0.02
+        PADDLE_SPEED_COMP_MAX= 0.02;
     case 'middle'
-        PADDLE_SPEED_COMP= 0.04
-        display('level is middle')
+        PADDLE_SPEED_COMP_MAX= 0.04;
     case 'high'
-        display('level is high')
-        PADDLE_SPEED_COMP= 0.06
+        PADDLE_SPEED_COMP_MAX= 0.06;
 end
+PADDLE_SPEED_COMP=PADDLE_SPEED_COMP_MAX;
+
+rounds= app.RoundsEditField.Value;
 
 fig= figure;
 %Quelle: https://ch.mathworks.com/help/matlab/ref/matlab.ui.figure-properties.html
@@ -55,7 +56,12 @@ BALL_SHAPE = 'o';
 BALL_RADIUS= 1/FIGURE_WIDTH+1/FIGURE_WIDTH*BALL_MARKER_SIZE/2;
 
 ball= plot(0.5,0.5);
-ballVector= [rand, rand];
+if rand>= 0.5
+    ballVector= [-rand, -rand];
+else
+    ballVector= [rand, rand];
+end
+
 ballSpeed= 0.01;
 
 set(ball, 'Marker', BALL_SHAPE);
@@ -88,6 +94,20 @@ patch([0 1 1 0], [0.95 0.95 1 1], [0 0 0 0], 'facecolor', 'g', ...
 patch([0 1 1 0], [0 0 0.05 0.05], [0 0 0 0], 'facecolor', 'g', ...
     'edgecolor', 'g', 'handlevisibility', 'off');
 
+%% Draw Scores & rounds
+sc_left = text(0.425 , 0.96, '0');
+sc_right = text(0.575 , 0.96, '0');
+//t_rounds = text(
+
+
+%% Draw Pause
+t_pause = text(0.5, 0.5, 'Game paused', 'visible','off');
+
+%% Set Text Options
+set([sc_left sc_right t_pause t_rounds], 'fontsize', 25, ...
+    'color', 'r', 'hor', 'center');
+
+
 %% Set Listners
 %register keydown and keyup listeners
 set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclose)
@@ -117,6 +137,8 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
                 %         end
                 %       case 'r'
                 %         newGame;
+            case 'p'
+                pauseGame();
             case 'q'
                 quit=true;
         end
@@ -161,7 +183,7 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
         newY = ball.YData + (ballSpeed * ballVector(2));
         m= (newY - ball.YData) / (newX - ball.XData);
         b= ball.YData - m * ball.XData;
-        yLeft= m * playerLeft.XData(2) + b;
+        yLeft= m * playerLeft.XData(2) + b; %XData bei Player immer gleich
         yRight= m * playerRight.XData(2) + b;
         
         %hit test top wall
@@ -179,23 +201,41 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
             
             %Hit right or left wall
         elseif (newX > 1-BALL_RADIUS || newX < BALL_RADIUS)
-            ballVector= [rand, rand];
+            if rand>= 0.5
+                ballVector= [-rand, -rand];
+            else
+                ballVector= [rand, rand];
+            end
             ballSpeed= 0.01;
             newX= 0.5; newY= 0.5;
+            if newX < BALL_RADIUS
+                score = get(sc_right, 'string');
+                set(sc_right, 'string', str2double(score)+1);
+            else
+                score = get(sc_left, 'string');
+                set(sc_left, 'string', str2double(score)+1);
+            end
             
             %hit left player
         elseif (ball.XData - BALL_RADIUS) < playerLeft.XData(2) && playerLeft.YData(2) <= yLeft && yLeft <= playerLeft.YData(3)
             %         disp('Hit Left')
-            ballVector(1)= ballVector(1)*(-1);
             ballSpeed= ballSpeed+0.001;
             newX= playerLeft.XData(2)+BALL_RADIUS;
+            
+            playerLeftCenter= (playerLeft.YData(3)-playerLeft.YData(1))/2+playerLeft.YData(1);
+            ballVector(2)= 20*(ball.YData-playerLeftCenter);
+            ballVector(1)= ballVector(1)*(-1);
             
             %hit right player
         elseif (ball.XData + BALL_RADIUS) > playerRight.XData(2) && playerRight.YData(2) <= yRight && yRight <= playerRight.YData(3)
             %         disp('Hit Right')
-            ballVector(1)= ballVector(1)*(-1);
             ballSpeed= ballSpeed+0.001;
             newX= playerRight.XData(2)-BALL_RADIUS;
+            
+            playerRightCenter= (playerRight.YData(3)-playerRight.YData(1))/2+playerRight.YData(1);
+            ballVector(2)= 20*(ball.YData-playerRightCenter);
+            ballVector(1)= ballVector(1)*(-1);
+            
         else
             %no hits
         end
@@ -209,6 +249,7 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
 %% move Computer
     function moveComputer
         %playerLeftCenter= (playerLeft.YData(3)-playerLeft.YData(1))/2+playerLeft.YData(1);
+        PADDLE_SPEED_COMP= min([PADDLE_SPEED_COMP_MAX, sqrt(abs(ball.XData-playerLeft.XData(2)))]);
         if ball.YData > playerLeft.YData(3)
             paddle1V= 1;
         elseif ball.YData < playerLeft.YData(1)
@@ -270,21 +311,40 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
         end
     end
 
+%% Game pause
+    function pauseGame
+        if ~paused
+            paused=true;
+            set(t_pause, 'visible', 'on')
+        else
+            paused=false;
+            set(t_pause, 'visible', 'off')
+        end
+    end
+
 %% Game
 
 switch app.GameMode.Value
     case '1 Player'
         while ~quit
-            calc1Player;
+            if paused
+                waitforbuttonpress
+            else
             moveComputer;
+            calc1Player;
             moveBall;
             refreshPlot;
+            end
         end
     case '2 Players'
         while ~quit
+            if paused
+                waitforbuttonpress
+            else
             calc2Players;
             moveBall;
             refreshPlot;
+            end
         end
 end
 

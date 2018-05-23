@@ -9,14 +9,15 @@ paused= false;
 
 %set Computer skill level
 switch app.SkillButtonGroup.SelectedObject.Text
-    case 'low'
+    case 'leicht'
         PADDLE_SPEED_COMP_MAX= 0.02;
-    case 'middle'
+    case 'mittel'
         PADDLE_SPEED_COMP_MAX= 0.04;
-    case 'high'
+    case 'schwer'
         PADDLE_SPEED_COMP_MAX= 0.06;
 end
-PADDLE_SPEED_COMP=PADDLE_SPEED_COMP_MAX;
+
+PADDLE_SPEED_COMP= PADDLE_SPEED_COMP_MAX;
 
 rounds= app.RoundsEditField.Value;
 roundsPlayed=1;
@@ -336,7 +337,7 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
 
 %% Game
 
-switch app.GameMode.Value
+switch app.GameModeButtonGroup.SelectedObject.Text
     case '1 Player'
         while ~quit
             if paused
@@ -348,7 +349,7 @@ switch app.GameMode.Value
             refreshPlot;
             end
         end
-    case '2 Players'
+    case '2 Player'
         while ~quit
             if paused
                 waitforbuttonpress

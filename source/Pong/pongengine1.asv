@@ -214,8 +214,8 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
             %Hit right or left wall
         elseif (newX > 1-BALL_RADIUS || newX < BALL_RADIUS)
             if newX < BALL_RADIUS %player right wins round
-                playerRightScore = playerRightScore+1;
-                set(playerRightScoreText, 'string', num2str(playerRightScore));
+                playerLeftScore = playerLeftScore+1;
+                set(playerRightScoreText, 'string', str2double(score)+1);
                 [newX,newY]=startNewRound(1);
             else %player left wins round
                 playerLeftScore = playerLeftScore+1;
@@ -372,14 +372,14 @@ t_winner= text(0.5, 0.5, 'nobody','visible', 'off', 'horizontalAlignment', 'cent
     function checkForWinner
         if roundsPlayed==rounds
             %see who won
-            if playerRightScore>playerLeftScore
+            if playerRightScoreText>playerLeftScoreText
                 set(t_winner, 'string',strcat(playerRightName, 32, 'WINS!'),'visible', 'on');
-            elseif playerRightScore<playerLeftScore
+            elseif playerRightScoreText<playerLeftScoreText
                 set(t_winner, 'string',strcat(playerLeftName, 32, 'WINS!'),'visible', 'on');
             else %draw
                 set(t_winner, 'string','DRAW!','visible', 'on');
             end
-            waitforbuttonpress
+            pause(6)
             quit=true;
         else
             %continue game

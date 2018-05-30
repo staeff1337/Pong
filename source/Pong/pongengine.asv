@@ -140,7 +140,7 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
 %% Callback Do on Close
     function figureclose(src,event)
         app.Pong.Visible='on';
-        app.UITable.Data= pongHighscoreRead(app.DatabaseName); 
+        app.
     end
 
 %% Callback -----------keyDown------------
@@ -407,8 +407,6 @@ t_highscore= text(0.5, 0.35, '0','visible', 'off', 'horizontalAlignment', 'cente
                 highscore= round(playerRightScore * scoreSkillFactor / playerRightHits);
                 set(t_highscore, 'string', strcat(playerRightName, 32, 'Highscore:', 32, num2str(highscore)),'visible', 'on');
                 pongHighscoreWrite(app.DatabaseName, playerRightName, highscore);
-            else
-                %do nothing
             end
             %
             pause(3);
@@ -446,7 +444,6 @@ switch app.GameModeButtonGroup.SelectedObject.Text
             end
         end
     case '2 Players'
-        onePlayerMode=false;
         while ~quit
             if paused
                 waitforbuttonpress

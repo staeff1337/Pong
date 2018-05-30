@@ -1,1 +1,1 @@
-pongHighscoreWrite(app.DatabaseName,**NameVomGwuennerAlsString,pongScorecalc(**AhzahlBeruerighe,app.GameModeButtonGroup.SelectedObject.Text);
+pongHighscoreWrite(app.DatabaseName,*string*NameVomGwuennerAlsString,pongScorecalc(*int*AhzahlBeruerighe,app.GameModeButtonGroup.SelectedObject.Text);

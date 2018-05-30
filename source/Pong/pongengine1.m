@@ -61,11 +61,12 @@ BALL_SHAPE = 'o';
 BALL_RADIUS= 1/FIGURE_WIDTH+1/FIGURE_WIDTH*BALL_MARKER_SIZE/2;
 
 ball= plot(0.5,0.5);
-if rand>= 0.5
-    ballVector= [-rand, -rand];
-else
-    ballVector= [rand, rand];
-end
+% if rand>= 0.5
+%     ballVector= [-rand, -rand];
+% else
+%     ballVector= [rand, rand];
+% end
+ballVector= [1, 0];
 
 ballSpeed= 0.01;
 

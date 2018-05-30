@@ -411,6 +411,7 @@ set(countdown_t, 'visible', 'off');
 switch app.GameModeButtonGroup.SelectedObject.Text
     case '1 Player'
         while ~quit
+            tic
             if paused
                 waitforbuttonpress
             else
@@ -419,6 +420,7 @@ switch app.GameModeButtonGroup.SelectedObject.Text
                 moveBall;
                 refreshPlot;
             end
+            toc
         end
     case '2 Players'
         while ~quit

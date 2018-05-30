@@ -25,7 +25,7 @@ end
 PLAYER_SPEED_COMP= PLAYER_SPEED_COMP_MAX;
 
 %set rounds
-rounds= app.RoundsEditField.Value;
+rounds= app.RoundsSpinner.Value;
 roundsPlayed= 1;
 
 %player names

@@ -1,6 +1,6 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
   <configuration build-checksum="3218640794" file="C:\Users\steff\switchdrive\01_Studium\01_Semester\08.Semester\matl\Projekt\Pong\source\Pong\Pong_1.prj" location="C:\Users\steff\switchdrive\01_Studium\01_Semester\08.Semester\matl\Projekt\Pong\source\Pong" name="Pong_1" preferred-package-location="C:\Users\steff\switchdrive\01_Studium\01_Semester\08.Semester\matl\Projekt\Pong\source\Pong\Pong_1\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
-    <param.appname>Pong_1</param.appname>
+    <param.appname>Pong</param.appname>
     <param.icon />
     <param.icons />
     <param.version>1.0</param.version>
@@ -9,9 +9,9 @@
     <param.company />
     <param.summary />
     <param.description />
-    <param.screenshot />
+    <param.screenshot>${PROJECT_ROOT}\iconPong.PNG</param.screenshot>
     <param.guid />
-    <param.installpath.string>\Pong_1\</param.installpath.string>
+    <param.installpath.string>\Pong\</param.installpath.string>
     <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
     <param.logo />
     <param.install.notes />
@@ -46,7 +46,6 @@
       <param.company />
       <param.summary />
       <param.description />
-      <param.screenshot />
       <param.guid />
       <param.installpath.string />
       <param.installpath.combo />
@@ -88,7 +87,7 @@
       <file>${PROJECT_ROOT}\pongHighscoreWrite.m</file>
     </fileset.depfun>
     <build-deliverables>
-      <file location="${PROJECT_ROOT}\Pong_1\for_testing" name="Pong_1.exe" optional="false">C:\Users\steff\switchdrive\01_Studium\01_Semester\08.Semester\matl\Projekt\Pong\source\Pong\Pong_1\for_testing\Pong_1.exe</file>
+      <file location="${PROJECT_ROOT}\Pong_1\for_testing" name="Pong.exe" optional="false">C:\Users\steff\switchdrive\01_Studium\01_Semester\08.Semester\matl\Projekt\Pong\source\Pong\Pong_1\for_testing\Pong.exe</file>
       <file location="${PROJECT_ROOT}\Pong_1\for_testing" name="readme.txt" optional="true">C:\Users\steff\switchdrive\01_Studium\01_Semester\08.Semester\matl\Projekt\Pong\source\Pong\Pong_1\for_testing\readme.txt</file>
       <file location="${PROJECT_ROOT}\Pong_1\for_testing" name="splash.png" optional="false">C:\Users\steff\switchdrive\01_Studium\01_Semester\08.Semester\matl\Projekt\Pong\source\Pong\Pong_1\for_testing\splash.png</file>
     </build-deliverables>

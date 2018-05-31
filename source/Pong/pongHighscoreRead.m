@@ -1,4 +1,4 @@
-function [HighscoreTabelData] = pongHighscoreReadxls(FileName)
+function [HighscoreTabelData] = pongHighscoreRead(FileName)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 % 
@@ -9,7 +9,7 @@ function [HighscoreTabelData] = pongHighscoreReadxls(FileName)
          name=char(pongHighscoreDatabase{1,1})
          score=pongHighscoreDatabase{1,2}
          highscoretable=table(name,score)
-         sortmap=sortrows(highscoretable,'score', 'descend')
+         sortmap=sortrows(highscoretable,'score', 'descend')s
          
 
 

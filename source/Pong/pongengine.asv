@@ -9,16 +9,6 @@ paused= false;
 %Player Speed
 PLAYER_SPEED= 0.025;
 
-%evaluate game typ
-switch app.GameModeButtonGroup.SelectedObject.Text
-    case '1 Player'
-        onePlayerMode= true;
-        playerLeftName= 'Computer';
-    case '2 Players'
-        onePlayerMode= false;
-        playerLeftName= app.NickPlayer2EditField.Value;
-end
-
 %set Computer skill level
 switch app.SkillButtonGroup.SelectedObject.Text
     case 'leicht'
@@ -35,12 +25,12 @@ end
 PLAYER_SPEED_COMP= PLAYER_SPEED_COMP_MAX;
 
 %set rounds
-rounds= app.RoundsSpinner.Value;
+rounds= app.RoundsEditField.Value;
 roundsPlayed= 1;
 
 %player names
 playerRightName= app.NickPlayer1EditField.Value;
-
+playerLeftName= app.NickPlayer2EditField.Value;
 
 %define figure
 fig= figure;
@@ -50,17 +40,15 @@ fig.NumberTitle= 'off'; % turn off number
 fig.MenuBar='none'; %turn off menubar
 fig.Color= 'k'; %set background color
 
-SCREEN_SCALING_FACTOR= 1;
-FIGURE_HEIGHT= 1000/SCREEN_SCALING_FACTOR;
-FIGURE_WIDTH= 1920/SCREEN_SCALING_FACTOR;
-
-screenSize = get(0,'ScreenSize');
-fig.OuterPosition= [(screenSize(3)-FIGURE_WIDTH)/2, (screenSize(4)-FIGURE_HEIGHT)/2, FIGURE_WIDTH, FIGURE_HEIGHT];
+% max 1920 x 1080 FULL HD
+FIGURE_HEIGHT= 900;
+FIGURE_WIDTH= 1700;
+scrsz = get(0,'ScreenSize');
+fig.InnerPosition= [(scrsz(3)-FIGURE_WIDTH)/2, (scrsz(4)-FIGURE_HEIGHT)/2, FIGURE_WIDTH, FIGURE_HEIGHT];
 
 %movegui(fig, 'center');
 fig.Resize= 'off';
-% fig.WindowState='maximized';
-
+%fig.WindowState='maximized';
 %fig.WindowState='fullscreen';
 %fig.WindowStyle= 'modal';%du kannst somit nicht nach MATLAB wechseln.
 
@@ -128,6 +116,7 @@ playerLeftScore= 0;
 playerLeftScoreText = text(0.06 , 0.975, num2str(playerLeftScore), 'horizontalAlignment', 'center');
 playerRightScore= 0;
 playerRightScoreText = text(0.94 , 0.975, num2str(playerRightScore),'horizontalAlignment', 'center');
+playerRightHits= 0;
 
 %quelle https://ch.mathworks.com/matlabcentral/answers/251996-how-to-insert-space-between-strings-while-doing-strcat
 textRounds = strcat( 'Round', 32, num2str(roundsPlayed), ' /', 32, num2str(rounds));
@@ -151,7 +140,7 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
 %% Callback Do on Close
     function figureclose(src,event)
         app.Pong.Visible='on';
-        app.UITable.Data= pongHighscoreRead(app.DatabaseName); 
+        app.
     end
 
 %% Callback -----------keyDown------------
@@ -220,7 +209,7 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
         
         %if ball past player last time
         %check hit left player
-        if ~ballPassedPlayer && (newX - BALL_RADIUS) < playerLeft.XData(2) && (playerLeft.YData(2) - BALL_RADIUS) < yLeft && yLeft < (playerLeft.YData(3) + BALL_RADIUS)
+        if ~ballPassedPlayer && (newX - BALL_RADIUS) < playerLeft.XData(2) && playerLeft.YData(2) < yLeft && yLeft < playerLeft.YData(3)
             %         disp('Hit Left')
             ballSpeed= ballSpeed+0.001;
             newX= playerLeft.XData(2)+BALL_RADIUS;
@@ -230,7 +219,7 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
             ballVector(1)= sign(ballVector(1))*-1;
             
             %check hit right player
-        elseif ~ballPassedPlayer && (newX + BALL_RADIUS) > playerRight.XData(2) && (playerRight.YData(2) - BALL_RADIUS) < yRight && yRight < (playerRight.YData(3) + BALL_RADIUS)
+        elseif ~ballPassedPlayer && (newX + BALL_RADIUS) > playerRight.XData(2) && playerRight.YData(2) < yRight && yRight < playerRight.YData(3)
             %         disp('Hit Right')
             ballSpeed= ballSpeed+0.001;
             newX= playerRight.XData(2)-BALL_RADIUS;
@@ -238,6 +227,8 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
             playerRightCenter= (playerRight.YData(3)-playerRight.YData(1))/2+playerRight.YData(1);
             ballVector(2)= 40*(ball.YData-playerRightCenter);
             ballVector(1)= sign(ballVector(1))*-1;
+            playerRightHits= playerRightHits+1;
+            
             
             %Hit right or left wall
         elseif (newX > 1-BALL_RADIUS || newX < BALL_RADIUS)
@@ -245,12 +236,10 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
                 playerRightScore = playerRightScore+1;
                 set(playerRightScoreText, 'string', num2str(playerRightScore));
                 [newX,newY]=startNewRound(1);
-                ballPassedPlayer= false;
             else %player left wins round
                 playerLeftScore = playerLeftScore+1;
                 set(playerLeftScoreText, 'string', num2str(playerLeftScore));
                 [newX,newY]=startNewRound(2);
-                ballPassedPlayer= false;
             end
             
             % check for a winner
@@ -283,37 +272,21 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
         if ~ballPassedPlayer && ball.XData - BALL_RADIUS < playerLeft.XData(2) || ball.XData + BALL_RADIUS > playerRight.XData(2)
             ballPassedPlayer= true;
         else
-           %do fuck all 
+            ballPassedPlayer= false;
         end
         
     end
 
 %% move Computer
     function moveComputer
-        playerLeftCenter= (playerLeft.YData(3)-playerLeft.YData(1))/2+playerLeft.YData(1);
         %         PADDLE_SPEED_COMP= min([PADDLE_SPEED_COMP_MAX, sqrt(abs(ball.XData-playerLeft.XData(2)))]);
         PLAYER_SPEED_COMP= PLAYER_SPEED_COMP_MAX;
-%         if playerLeftV== 0 && (ball.YData + BALL_RADIUS) > playerLeft.YData(3)
-%             playerLeftV= 1;
-%         elseif playerLeftV== 0 && (ball.YData - BALL_RADIUS) < playerLeft.YData(1)
-%             playerLeftV= -1;
-%         elseif playerLeftV==1 && (ball.YData - BALL_RADIUS) < playerLeft.YData(1)
-%             playerLeftV= 0;
-%          elseif playerLeftV==(-1) && (ball.YData + BALL_RADIUS) > playerLeft.YData(1)
-%             playerLeftV= 0;
-%         else
-% %             playerLeftV= 0;
-%         end
-        if playerLeftV== 0 && (ball.YData + BALL_RADIUS) > playerLeft.YData(3)
+        if ball.YData > playerLeft.YData(3)
             playerLeftV= 1;
-        elseif playerLeftV== 0 && (ball.YData - BALL_RADIUS) < playerLeft.YData(1)
+        elseif ball.YData < playerLeft.YData(1)
             playerLeftV= -1;
-        elseif playerLeftV==1 && (ball.YData - BALL_RADIUS) < playerLeftCenter
-            playerLeftV= 0;
-         elseif playerLeftV==(-1) && (ball.YData + BALL_RADIUS) > playerLeftCenter
-            playerLeftV= 0;
         else
-%             playerLeftV= 0;
+            playerLeftV= 0;
         end
     end
 
@@ -431,11 +404,9 @@ t_highscore= text(0.5, 0.35, '0','visible', 'off', 'horizontalAlignment', 'cente
                 set(t_winner, 'string','DRAW!','visible', 'on');
             end
             if onePlayerMode
-                highscore= playerRightScore * scoreSkillFactor;
+                highscore= round(playerRightScore * scoreSkillFactor / playerRightHits);
                 set(t_highscore, 'string', strcat(playerRightName, 32, 'Highscore:', 32, num2str(highscore)),'visible', 'on');
                 pongHighscoreWrite(app.DatabaseName, playerRightName, highscore);
-            else
-                %do nothing
             end
             %
             pause(3);
@@ -473,7 +444,6 @@ switch app.GameModeButtonGroup.SelectedObject.Text
             end
         end
     case '2 Players'
-        onePlayerMode=false;
         while ~quit
             if paused
                 waitforbuttonpress

@@ -9,6 +9,16 @@ paused= false;
 %Player Speed
 PLAYER_SPEED= 0.025;
 
+%evaluate game typ
+switch app.GameModeButtonGroup.SelectedObject.Text
+    case '1 Player'
+        onePlayerMode= true;
+        playerLeftName= 'Computer';
+    case '2 Players'
+        onePlayerMode= false;
+        playerLeftName= app.NickPlayer2EditField.Value;
+end
+
 %set Computer skill level
 switch app.SkillButtonGroup.SelectedObject.Text
     case 'leicht'
@@ -30,7 +40,7 @@ roundsPlayed= 1;
 
 %player names
 playerRightName= app.NickPlayer1EditField.Value;
-playerLeftName= app.NickPlayer2EditField.Value;
+
 
 %define figure
 fig= figure;
@@ -43,12 +53,13 @@ fig.Color= 'k'; %set background color
 % max 1920 x 1080 FULL HD
 FIGURE_HEIGHT= 900;
 FIGURE_WIDTH= 1700;
-scrsz = get(0,'ScreenSize');
-fig.InnerPosition= [(scrsz(3)-FIGURE_WIDTH)/2, (scrsz(4)-FIGURE_HEIGHT)/2, FIGURE_WIDTH, FIGURE_HEIGHT];
+SCREEN_SCALING_FACTOR= 1.5;
+screenSize = get(0,'ScreenSize') * SCREEN_SCALING_FACTOR;
+fig.InnerPosition= [(screenSize(3)-FIGURE_WIDTH)/2, (screenSize(4)-FIGURE_HEIGHT)/2, FIGURE_WIDTH, FIGURE_HEIGHT];
 
 %movegui(fig, 'center');
-fig.Resize= 'off';
-%fig.WindowState='maximized';
+% fig.Resize= 'off';
+fig.WindowState='maximized';
 %fig.WindowState='fullscreen';
 %fig.WindowStyle= 'modal';%du kannst somit nicht nach MATLAB wechseln.
 
@@ -116,7 +127,6 @@ playerLeftScore= 0;
 playerLeftScoreText = text(0.06 , 0.975, num2str(playerLeftScore), 'horizontalAlignment', 'center');
 playerRightScore= 0;
 playerRightScoreText = text(0.94 , 0.975, num2str(playerRightScore),'horizontalAlignment', 'center');
-playerRightHits= 0;
 
 %quelle https://ch.mathworks.com/matlabcentral/answers/251996-how-to-insert-space-between-strings-while-doing-strcat
 textRounds = strcat( 'Round', 32, num2str(roundsPlayed), ' /', 32, num2str(rounds));
@@ -227,8 +237,6 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
             playerRightCenter= (playerRight.YData(3)-playerRight.YData(1))/2+playerRight.YData(1);
             ballVector(2)= 40*(ball.YData-playerRightCenter);
             ballVector(1)= sign(ballVector(1))*-1;
-            playerRightHits= playerRightHits+1;
-            
             
             %Hit right or left wall
         elseif (newX > 1-BALL_RADIUS || newX < BALL_RADIUS)
@@ -404,7 +412,7 @@ t_highscore= text(0.5, 0.35, '0','visible', 'off', 'horizontalAlignment', 'cente
                 set(t_winner, 'string','DRAW!','visible', 'on');
             end
             if onePlayerMode
-                highscore= round(playerRightScore * scoreSkillFactor / playerRightHits);
+                highscore= playerRightScore * scoreSkillFactor;
                 set(t_highscore, 'string', strcat(playerRightName, 32, 'Highscore:', 32, num2str(highscore)),'visible', 'on');
                 pongHighscoreWrite(app.DatabaseName, playerRightName, highscore);
             else

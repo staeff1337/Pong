@@ -1,17 +1,19 @@
-function [HighscoreTabelData] = pongHighscoreRead(FileName)
+function [HighscoreTabelData] = pongHighscoreReadxls(FileName)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 % 
 % 
-         fid = fopen(FileName);    %csv Datei einlesen.
-         pongHighscoreDatabase = textscan(fid,' %s %f %f'); 
-         fclose(fid); 
-         name=char(pongHighscoreDatabase{1,1});
-         score=pongHighscoreDatabase{1,2};
-         highscoretable=table(name,score);
-         sortmap=sortrows(highscoretable,'score', 'descend');
-         
-         
+
+[pongHighscoreDatabaseScore,pongHighscoreDatabaseName]=xlsread(FileName,'sheet1')
+
+%          fid = fopen(FileName);    %csv Datei einlesen.
+%          pongHighscoreDatabase = textscan(fid,' %s %f %f'); 
+%          fclose(fid); 
+  name=char(pongHighscoreDatabaseName);
+        score=pongHighscoreDatabaseScore;
+       highscoretable=table(name,score);
+       sortmap=sortrows(highscoretable,'score', 'descend');
+%           
          
 
 

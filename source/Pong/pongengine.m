@@ -50,16 +50,17 @@ fig.NumberTitle= 'off'; % turn off number
 fig.MenuBar='none'; %turn off menubar
 fig.Color= 'k'; %set background color
 
-% max 1920 x 1080 FULL HD
-FIGURE_HEIGHT= 900;
-FIGURE_WIDTH= 1700;
-SCREEN_SCALING_FACTOR= 1.5;
-screenSize = get(0,'ScreenSize') * SCREEN_SCALING_FACTOR;
-fig.InnerPosition= [(screenSize(3)-FIGURE_WIDTH)/2, (screenSize(4)-FIGURE_HEIGHT)/2, FIGURE_WIDTH, FIGURE_HEIGHT];
+SCREEN_SCALING_FACTOR= 1;
+FIGURE_HEIGHT= 1000/SCREEN_SCALING_FACTOR;
+FIGURE_WIDTH= 1920/SCREEN_SCALING_FACTOR;
+
+screenSize = get(0,'ScreenSize');
+fig.OuterPosition= [(screenSize(3)-FIGURE_WIDTH)/2, (screenSize(4)-FIGURE_HEIGHT)/2, FIGURE_WIDTH, FIGURE_HEIGHT];
 
 %movegui(fig, 'center');
-% fig.Resize= 'off';
-fig.WindowState='maximized';
+fig.Resize= 'off';
+% fig.WindowState='maximized';
+
 %fig.WindowState='fullscreen';
 %fig.WindowStyle= 'modal';%du kannst somit nicht nach MATLAB wechseln.
 
@@ -219,7 +220,7 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
         
         %if ball past player last time
         %check hit left player
-        if ~ballPassedPlayer && (newX - BALL_RADIUS) < playerLeft.XData(2) && playerLeft.YData(2) < yLeft && yLeft < playerLeft.YData(3)
+        if ~ballPassedPlayer && (newX - BALL_RADIUS) < playerLeft.XData(2) && (playerLeft.YData(2) - BALL_RADIUS) < yLeft && yLeft < (playerLeft.YData(3) + BALL_RADIUS)
             %         disp('Hit Left')
             ballSpeed= ballSpeed+0.001;
             newX= playerLeft.XData(2)+BALL_RADIUS;
@@ -229,7 +230,7 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
             ballVector(1)= sign(ballVector(1))*-1;
             
             %check hit right player
-        elseif ~ballPassedPlayer && (newX + BALL_RADIUS) > playerRight.XData(2) && playerRight.YData(2) < yRight && yRight < playerRight.YData(3)
+        elseif ~ballPassedPlayer && (newX + BALL_RADIUS) > playerRight.XData(2) && (playerRight.YData(2) - BALL_RADIUS) < yRight && yRight < (playerRight.YData(3) + BALL_RADIUS)
             %         disp('Hit Right')
             ballSpeed= ballSpeed+0.001;
             newX= playerRight.XData(2)-BALL_RADIUS;
@@ -244,10 +245,12 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
                 playerRightScore = playerRightScore+1;
                 set(playerRightScoreText, 'string', num2str(playerRightScore));
                 [newX,newY]=startNewRound(1);
+                ballPassedPlayer= false;
             else %player left wins round
                 playerLeftScore = playerLeftScore+1;
                 set(playerLeftScoreText, 'string', num2str(playerLeftScore));
                 [newX,newY]=startNewRound(2);
+                ballPassedPlayer= false;
             end
             
             % check for a winner
@@ -280,21 +283,37 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
         if ~ballPassedPlayer && ball.XData - BALL_RADIUS < playerLeft.XData(2) || ball.XData + BALL_RADIUS > playerRight.XData(2)
             ballPassedPlayer= true;
         else
-            ballPassedPlayer= false;
+           %do fuck all 
         end
         
     end
 
 %% move Computer
     function moveComputer
+        playerLeftCenter= (playerLeft.YData(3)-playerLeft.YData(1))/2+playerLeft.YData(1);
         %         PADDLE_SPEED_COMP= min([PADDLE_SPEED_COMP_MAX, sqrt(abs(ball.XData-playerLeft.XData(2)))]);
         PLAYER_SPEED_COMP= PLAYER_SPEED_COMP_MAX;
-        if ball.YData > playerLeft.YData(3)
+%         if playerLeftV== 0 && (ball.YData + BALL_RADIUS) > playerLeft.YData(3)
+%             playerLeftV= 1;
+%         elseif playerLeftV== 0 && (ball.YData - BALL_RADIUS) < playerLeft.YData(1)
+%             playerLeftV= -1;
+%         elseif playerLeftV==1 && (ball.YData - BALL_RADIUS) < playerLeft.YData(1)
+%             playerLeftV= 0;
+%          elseif playerLeftV==(-1) && (ball.YData + BALL_RADIUS) > playerLeft.YData(1)
+%             playerLeftV= 0;
+%         else
+% %             playerLeftV= 0;
+%         end
+        if playerLeftV== 0 && (ball.YData + BALL_RADIUS) > playerLeft.YData(3)
             playerLeftV= 1;
-        elseif ball.YData < playerLeft.YData(1)
+        elseif playerLeftV== 0 && (ball.YData - BALL_RADIUS) < playerLeft.YData(1)
             playerLeftV= -1;
-        else
+        elseif playerLeftV==1 && (ball.YData - BALL_RADIUS) < playerLeftCenter
             playerLeftV= 0;
+         elseif playerLeftV==(-1) && (ball.YData + BALL_RADIUS) > playerLeftCenter
+            playerLeftV= 0;
+        else
+%             playerLeftV= 0;
         end
     end
 

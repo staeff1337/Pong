@@ -7,7 +7,7 @@ quit= false;
 paused= false;
 
 %Player Speed
-PLAYER_SPEED= 0.025;
+PLAYER_SPEED= 0.02;
 
 %evaluate game typ
 switch app.GameModeButtonGroup.SelectedObject.Text
@@ -95,7 +95,8 @@ else
 end
 
 ballPassedPlayer= false;
-ballSpeed= 0.01;
+BALL_START_SPEED= 0.005;
+ballSpeed= BALL_START_SPEED;
 
 %% I have no clue why this works
 set(gca,'Color','k','xtick', [], 'ytick', []);
@@ -222,7 +223,7 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
         %check hit left player
         if ~ballPassedPlayer && (newX - BALL_RADIUS) < playerLeft.XData(2) && (playerLeft.YData(2) - BALL_RADIUS) < yLeft && yLeft < (playerLeft.YData(3) + BALL_RADIUS)
             %         disp('Hit Left')
-            ballSpeed= ballSpeed+0.001;
+            ballSpeed= ballSpeed+0.0005;
             newX= playerLeft.XData(2)+BALL_RADIUS;
             
             playerLeftCenter= (playerLeft.YData(3)-playerLeft.YData(1))/2+playerLeft.YData(1);
@@ -232,7 +233,7 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
             %check hit right player
         elseif ~ballPassedPlayer && (newX + BALL_RADIUS) > playerRight.XData(2) && (playerRight.YData(2) - BALL_RADIUS) < yRight && yRight < (playerRight.YData(3) + BALL_RADIUS)
             %         disp('Hit Right')
-            ballSpeed= ballSpeed+0.001;
+            ballSpeed= ballSpeed+0.0005;
             newX= playerRight.XData(2)-BALL_RADIUS;
             
             playerRightCenter= (playerRight.YData(3)-playerRight.YData(1))/2+playerRight.YData(1);
@@ -315,6 +316,18 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
         else
 %             playerLeftV= 0;
         end
+%         if playerLeftV== 0 && (ball.YData + BALL_RADIUS) > playerLeftCenter
+%             playerLeftV= 1;
+%         elseif playerLeftV== 0 && (ball.YData - BALL_RADIUS) < playerLeftCenter
+%             playerLeftV= -1;
+%         elseif playerLeftV==1 && (ball.YData - BALL_RADIUS) < playerLeft.YData(2)
+%             playerLeftV= 0;
+%          elseif playerLeftV==(-1) && (ball.YData + BALL_RADIUS) > playerLeft.YData(3)
+%             playerLeftV= 0;
+%         else
+% %             playerLeftV= 0;
+%         end
+
     end
 
 %% ------------refreshPlot------------
@@ -383,11 +396,11 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
 
 %% Start new round
     function [newX,newY]=startNewRound(winner)
+        ballSpeed= BALL_START_SPEED;
         switch winner
-            
+        
             %Player 1, right player
             case 1
-                ballSpeed= 0.01;
                 newX= 0.5; newY= 0.5;
                 if rand>= 0.5
                     y=rand;
@@ -401,7 +414,7 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
                 
                 %Player 2, left player
             case 2
-                ballSpeed= 0.01;
+                
                 newX= 0.5; newY= 0.5;
                 if rand>= 0.5
                     y=rand;
@@ -412,8 +425,7 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @figureclo
                     x=max(y,rand);
                     ballVector= [x, -y];
                 end
-        end
-        
+        end    
     end
 
 %% Check for winner

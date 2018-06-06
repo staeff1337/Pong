@@ -2,15 +2,13 @@
 %   Autoren:    A.Gessler - alex.gessler@students.fhnw.ch
 %               M.Steffen - marco.steffen@students.fhnw.ch
 %
-%   Zweck:      Oeffnet das Excelfile, trägt Name und  Tabellen und sortiert nach
-%               Highscores die Einträge. Gibt ein Array der besten 10
-%               Resultate zurück.
+%   Zweck:      Oeffnet das Excelfile, trägt Name und Score auf der nächste
+%               freien Zeile ein.
 %
 %   Versionskontrolle via Github: https://github.com/staeff1337/Pong.git
 
 
 function   pongHighscoreWrite(FileName,Name,Score)
-
 
 DataBaseCnt=convertCharsToStrings(num2str(length(xlsread(FileName))+1)); %Ermittelt die nächste freie Zeile in der Excel Datei.
 

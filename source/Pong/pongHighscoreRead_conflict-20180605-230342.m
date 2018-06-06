@@ -12,7 +12,7 @@ sortmap=sortrows(highscoretable,'score', 'descend');        %Sortiert die Tabell
 
 
 
-HighscoreTabelData={1,char(sortmap{1,1}),sortmap{1,2};      %Erstellt eine Char Array Matrix mit den besten 10 Spielern. 
+HighscoreTabelData={1,char(sortmap{1,1}),sortmap{1,2};      %Erstellt eine Char Array Matrix für das Objekt uiTable mit den besten 10 Spielern. 
     2,char(sortmap{2,1}),sortmap{2,2};
     3,char(sortmap{3,1}),sortmap{3,2};
     4,char(sortmap{4,1}),sortmap{4,2};

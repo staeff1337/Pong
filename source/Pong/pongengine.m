@@ -5,10 +5,7 @@
 %   Zweck:      Baut das Spielfeld auf, steuert den Spielablauf und
 %               übergibt allenfalls Highscore dem Excelfile.
 %
-%   Inputs:     Eine app Instanz von pong.mlapp
-%   Outputs:    keine
-%
-%   Versionskontrolle via Github.
+%   Versionskontrolle via Github: https://github.com/staeff1337/Pong.git
 
 
 function []= pongengine(app)
@@ -19,17 +16,14 @@ function []= pongengine(app)
 quit= false;
 paused= false;
 
-%   Player Speed
-PLAYER_SPEED= 0.02;
-
 %   Spielmodi evaluieren
 switch app.GameModeButtonGroup.SelectedObject.Text
     case '1 Player'
         onePlayerMode= true;
-        playerLeftName= 'Computer'; % Spieler 2, Name setzen für Computer
+        playerLeftName= 'Computer';
     case '2 Players'
         onePlayerMode= false;
-        playerLeftName= app.NickPlayer2EditField.Value; % Spieler 2
+        playerLeftName= app.NickPlayer2EditField.Value;
 end
 
 %   Computer skill level setzen
@@ -48,6 +42,9 @@ end
 %   Anzahl Runden übergeben
 rounds= app.RoundsSpinner.Value;
 roundsPlayed= 1;
+
+%   Player Speed
+PLAYER_SPEED= 0.02;
 
 %   Spieler 1 Name übergeben
 playerRightName= app.NickPlayer1EditField.Value;
@@ -80,6 +77,7 @@ axes('units', 'normalized', 'position', [0 0 1 1], 'xtick', [], 'ytick', [], 'co
 
 
 %%  Ball auf dem Spielfeld erstellen
+%   Quelle: https://ch.mathworks.com/matlabcentral/fileexchange/31177-dave-s-matlab-pong
 
 %   Ball Marker für Plot definieren
 BALL_MARKER_SIZE= 20;
@@ -256,6 +254,45 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @closeFigu
     end
 
 
+%%  Funktion Spieler bewegen
+%   Zweck: Neue Positionen der Spieler auf dem Spielfeld berechnen.
+
+    function movePlayers
+        
+        % Neue Position Spieler 1 setzen
+        yd_playerRight= yd_playerRight + (PLAYER_SPEED * playerRightV);
+        
+        % Neue Position Spieler 2 setzen
+        % 1 Player Modus
+        if onePlayerMode
+            calcComputer;
+            yd_playerLeft= yd_playerLeft + (PLAYER_SPEED_COMP * playerLeftV);
+        % 2 Player Modus
+        else
+            yd_playerLeft= yd_playerLeft + (PLAYER_SPEED * playerLeftV);
+        end
+        
+        % Spieler 1 innerhalb vom Spielfeld behalten
+        % oben
+        if yd_playerRight(3) > 0.95
+            yd_playerRight= [0.85 0.85 0.95 0.95];
+        % unten
+        elseif yd_playerRight(1) < 0.05
+            yd_playerRight= [0.05 0.05 0.15 0.15];
+        end
+        
+        % Spieler 2 innerhalb vom Spielfeld behalten
+        % oben
+        if yd_playerLeft(3) > 0.95
+            yd_playerLeft= [0.85 0.85 0.95 0.95];
+            % unten
+        elseif yd_playerLeft(1) < 0.05
+            yd_playerLeft= [0.05 0.05 0.15 0.15];
+        end
+        
+    end
+
+
 %%  Funktion Computer Spieler bewegen
 %   Zweck: Die neue Position des Computer Spielers wird berechnet.
 
@@ -282,44 +319,6 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @closeFigu
         else
             % Richtung bleibt
         end
-    end
-
-
-%%  Funktion Spieler bewegen
-%   Zweck: Neue Positionen der Spieler auf dem Spielfeld berechnen.
-
-    function movePlayers
-        
-        % Neue Position Spieler 1 setzen
-        yd_playerRight= yd_playerRight + (PLAYER_SPEED * playerRightV);
-        
-        % Neue Position Spieler 2 setzen
-        % 1 Player Modus
-        if onePlayerMode
-            yd_playerLeft= yd_playerLeft + (PLAYER_SPEED_COMP * playerLeftV);
-        % 2 Player Modus
-        else
-            yd_playerLeft= yd_playerLeft + (PLAYER_SPEED * playerLeftV);
-        end
-        
-        % Spieler 1 innerhalb vom Spielfeld behalten
-        % oben
-        if yd_playerRight(3) > 0.95
-            yd_playerRight= [0.85 0.85 0.95 0.95];
-        % unten
-        elseif yd_playerRight(1) < 0.05
-            yd_playerRight= [0.05 0.05 0.15 0.15];
-        end
-        
-        % Spieler 2 innerhalb vom Spielfeld behalten
-        % oben
-        if yd_playerLeft(3) > 0.95
-            yd_playerLeft= [0.85 0.85 0.95 0.95];
-            % unten
-        elseif yd_playerLeft(1) < 0.05
-            yd_playerLeft= [0.05 0.05 0.15 0.15];
-        end
-        
     end
 
 
@@ -471,7 +470,10 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @closeFigu
 
 
 %%  Funktion Prüfen ob Gewinner vorhanden
-%   Zweck: Prüfen ob die Anzahl definierte Runden gespielt wurden, 
+%   Zweck: Prüfen ob die Anzahl definierte Runden gespielt wurden, falls ja
+%   stellt Gewinner fest und zeigt diesen an. Anschliessend wird das flag
+%   zum beenden des Spiels gesetzt. Wurde im Spielmodi "1 Player"
+%   gespielt wird der Highscore anzeigt und in das Excelfile geschrieben.
 
     function checkForWinner
         if roundsPlayed == rounds
@@ -546,8 +548,7 @@ set(fig,'KeyPressFcn',@keyDown, 'KeyReleaseFcn', @keyUp, 'DeleteFcn', @closeFigu
     end
 
 
-%%  Main Spiel-Loop
-
+%% Countdown vor Spielbeginn anzeigen
 %   Startpunkt countdown definieren
 countdown= 3;
 
@@ -560,21 +561,25 @@ end
 %   Text countdown wieder unsichtbar machen
 set(countdown_t, 'visible', 'off');
 
-%   Main loop vom engine
+
+%%  Main Spiel-Loop
+%   Hier wird der main loop ausgeführt der zyklisch die wichtigsten
+%   Funktionen für den Spielablauf ausführt.
+
+%   main loop vom engine
 while ~quit
     if paused
         % Ausführung unterbrechen bis eine Taste gedrückt wird
         waitforbuttonpress;
     else
-        calcComputer;
         movePlayers;
         moveBall;
         refreshScreen;
     end
 end
 
-% Loop wurde durch Flag "quit" beendet, Figure wird geschlossen und löst
-% Callback Funktion closeFigure() aus.
+% Der main loop wurde durch Flag "quit" beendet, Figure wird geschlossen 
+% und löst Callback Funktion closeFigure() aus.
 close(gcf);
 
 end
